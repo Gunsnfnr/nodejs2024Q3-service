@@ -4,6 +4,7 @@ import { UpdatePasswordDto } from './dto/update-password.dto';
 import { users } from './data';
 import { User } from './entities/user.entity';
 import { userWithoutPassword } from './utils/user-wo-password';
+import { getIndexById } from 'src/utils/get-index-by-id';
 
 @Injectable()
 export class UserService {
@@ -45,12 +46,7 @@ export class UserService {
   }
 
   remove(id: string) {
-    let indexOfUser: number | undefined;
-    users.forEach((user, index) => {
-      if (user.id === id) {
-        indexOfUser = index;
-      }
-    });
+    const indexOfUser = getIndexById(users, id);
     users.splice(indexOfUser, 1);
   }
 }
