@@ -5,6 +5,9 @@ import { albums } from './data';
 import { artists } from 'src/artist/data';
 import { UpdateAlbumDto } from './dto/update-album.dto';
 import { getIndexById } from 'src/utils/get-index-by-id';
+import { tracks } from 'src/track/data';
+import { removeFavFrom } from 'src/utils/remove-fav';
+import { favs } from 'src/favs/data';
 
 @Injectable()
 export class AlbumService {
@@ -50,5 +53,9 @@ export class AlbumService {
   remove(id: string) {
     const indexOfAlbum = getIndexById(albums, id);
     albums.splice(indexOfAlbum, 1);
+    tracks.forEach((track) => {
+      if (track.albumId === id) track.albumId = null;
+    });
+    removeFavFrom(favs.albums, id);
   }
 }

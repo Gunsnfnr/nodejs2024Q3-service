@@ -4,6 +4,10 @@ import { UpdateArtistDto } from './dto/update-artist.dto';
 import { Artist } from './entities/artist.entity';
 import { artists } from './data';
 import { getIndexById } from 'src/utils/get-index-by-id';
+import { albums } from 'src/album/data';
+import { tracks } from 'src/track/data';
+import { favs } from 'src/favs/data';
+import { removeFavFrom } from 'src/utils/remove-fav';
 
 @Injectable()
 export class ArtistService {
@@ -47,5 +51,12 @@ export class ArtistService {
   remove(id: string) {
     const indexOfArtist = getIndexById(artists, id);
     artists.splice(indexOfArtist, 1);
+    albums.forEach((album) => {
+      if (album.artistId === id) album.artistId = null;
+    });
+    tracks.forEach((track) => {
+      if (track.artistId === id) track.artistId = null;
+    });
+    removeFavFrom(favs.artists, id);
   }
 }

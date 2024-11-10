@@ -20,7 +20,6 @@ export class CreateTrackDto {
   @ValidateIf((obj, val) => val !== null)
   albumId: string | null;
 
-  @IsNumber()
   @IsPositive()
   duration: number;
 }

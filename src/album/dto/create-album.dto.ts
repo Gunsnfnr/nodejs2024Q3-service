@@ -12,7 +12,6 @@ export class CreateAlbumDto {
   @IsNotEmpty()
   name: string;
 
-  @IsNumber()
   @IsPositive()
   year: number;
 

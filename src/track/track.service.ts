@@ -4,6 +4,8 @@ import { UpdateTrackDto } from './dto/update-track.dto';
 import { Track } from './entities/track.entity';
 import { tracks } from './data';
 import { getIndexById } from 'src/utils/get-index-by-id';
+import { removeFavFrom } from 'src/utils/remove-fav';
+import { favs } from 'src/favs/data';
 
 @Injectable()
 export class TrackService {
@@ -55,5 +57,6 @@ export class TrackService {
   remove(id: string) {
     const indexOfTrack = getIndexById(tracks, id);
     tracks.splice(indexOfTrack, 1);
+    removeFavFrom(favs.tracks, id);
   }
 }
