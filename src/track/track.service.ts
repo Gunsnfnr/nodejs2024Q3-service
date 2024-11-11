@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateTrackDto } from './dto/create-track.dto';
 import { UpdateTrackDto } from './dto/update-track.dto';
 import { Track } from './entities/track.entity';
@@ -31,13 +31,14 @@ export class TrackService {
     const requestedTrack: Track = tracks.filter(
       (track: Track) => track.id === id,
     )[0];
+    if (!requestedTrack) throw new NotFoundException('Track does not exist.');
     return requestedTrack;
   }
 
   update(id: string, updateTrackDto: UpdateTrackDto) {
-    const processedTrack: Track = tracks.filter(
-      (artist: Track) => artist.id === id,
-    )[0];
+    const processedTrack: Track = this.findOne(id);
+    if (!processedTrack) throw new NotFoundException('Track does not exist.');
+
     if ('name' in updateTrackDto) {
       processedTrack.name = updateTrackDto.name;
     }
@@ -55,6 +56,9 @@ export class TrackService {
   }
 
   remove(id: string) {
+    const processedTrack: Track = this.findOne(id);
+    if (!processedTrack) throw new NotFoundException('Track does not exist.');
+
     const indexOfTrack = getIndexById(tracks, id);
     tracks.splice(indexOfTrack, 1);
     removeFavFrom(favs.tracks, id);

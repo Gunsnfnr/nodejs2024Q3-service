@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateArtistDto } from './dto/create-artist.dto';
 import { UpdateArtistDto } from './dto/update-artist.dto';
 import { Artist } from './entities/artist.entity';
@@ -31,13 +31,14 @@ export class ArtistService {
     const requestedArtist: Artist = artists.filter(
       (artist: Artist) => artist.id === id,
     )[0];
+    if (!requestedArtist) throw new NotFoundException('Artist does not exist.');
     return requestedArtist;
   }
 
   update(id: string, updateArtistDto: UpdateArtistDto) {
-    const processedArtist: Artist = artists.filter(
-      (artist: Artist) => artist.id === id,
-    )[0];
+    const processedArtist: Artist = this.findOne(id);
+    if (!processedArtist) throw new NotFoundException('Artist does not exist.');
+
     if ('grammy' in updateArtistDto) {
       processedArtist.grammy = updateArtistDto.grammy;
     }
@@ -49,6 +50,9 @@ export class ArtistService {
   }
 
   remove(id: string) {
+    const processedArtist: Artist = this.findOne(id);
+    if (!processedArtist) throw new NotFoundException('Artist does not exist.');
+
     const indexOfArtist = getIndexById(artists, id);
     artists.splice(indexOfArtist, 1);
     albums.forEach((album) => {

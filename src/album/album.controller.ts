@@ -4,7 +4,6 @@ import {
   Delete,
   Get,
   HttpCode,
-  NotFoundException,
   Param,
   ParseUUIDPipe,
   Post,
@@ -38,9 +37,7 @@ export class AlbumContoller {
 
   @Get(':id')
   findOne(@Param('id', new ParseUUIDPipe()) id: string) {
-    const requestedAlbum = this.albumService.findOne(id);
-    if (!requestedAlbum) throw new NotFoundException('Album does not exist.');
-    return requestedAlbum;
+    return this.albumService.findOne(id);
   }
 
   @Put(':id')
@@ -53,17 +50,12 @@ export class AlbumContoller {
     @Param('id', new ParseUUIDPipe()) id: string,
     @Body() updateAlbumDto: UpdateAlbumDto,
   ) {
-    if (!this.albumService.findOne(id))
-      throw new NotFoundException('Album does not exist.');
-
     return this.albumService.update(id, updateAlbumDto);
   }
 
   @Delete(':id')
   @HttpCode(204)
   remove(@Param('id', new ParseUUIDPipe()) id: string) {
-    if (!this.albumService.findOne(id))
-      throw new NotFoundException('Album does not exist.');
     return this.albumService.remove(id);
   }
 }

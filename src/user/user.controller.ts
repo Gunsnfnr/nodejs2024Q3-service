@@ -9,7 +9,6 @@ import {
   UsePipes,
   ValidationPipe,
   ParseUUIDPipe,
-  NotFoundException,
   HttpCode,
 } from '@nestjs/common';
 import { UserService } from './user.service';
@@ -38,9 +37,7 @@ export class UserController {
 
   @Get(':id')
   findOne(@Param('id', new ParseUUIDPipe()) id: string) {
-    const requestedUser = this.userService.findOne(id);
-    if (!requestedUser) throw new NotFoundException('User does not exist.');
-    return requestedUser;
+    return this.userService.findOne(id);
   }
 
   @Put(':id')
@@ -54,17 +51,12 @@ export class UserController {
     @Param('id', new ParseUUIDPipe()) id: string,
     @Body() updatePasswordDto: UpdatePasswordDto,
   ) {
-    if (!this.userService.findOne(id))
-      throw new NotFoundException('User does not exist.');
-
     return this.userService.update(id, updatePasswordDto);
   }
 
   @Delete(':id')
   @HttpCode(204)
   remove(@Param('id', new ParseUUIDPipe()) id: string) {
-    if (!this.userService.findOne(id))
-      throw new NotFoundException('User does not exist.');
     return this.userService.remove(id);
   }
 }

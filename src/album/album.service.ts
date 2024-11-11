@@ -1,8 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateAlbumDto } from './dto/create-album.dto';
 import { Album } from './entities/album.entities';
 import { albums } from './data';
-import { artists } from 'src/artist/data';
 import { UpdateAlbumDto } from './dto/update-album.dto';
 import { getIndexById } from 'src/utils/get-index-by-id';
 import { tracks } from 'src/track/data';
@@ -32,11 +31,15 @@ export class AlbumService {
     const requestedAlbum: Album = albums.filter(
       (album: Album) => album.id === id,
     )[0];
+    if (!requestedAlbum) throw new NotFoundException('Album does not exist.');
+
     return requestedAlbum;
   }
 
   update(id: string, updateAlbumDto: UpdateAlbumDto) {
-    const processedAlbum: Album = albums.filter((album) => album.id === id)[0];
+    const processedAlbum: Album = this.findOne(id);
+    if (!processedAlbum) throw new NotFoundException('Album does not exist.');
+
     if ('name' in updateAlbumDto) {
       processedAlbum.name = updateAlbumDto.name;
     }
@@ -51,6 +54,9 @@ export class AlbumService {
   }
 
   remove(id: string) {
+    const processedAlbum: Album = this.findOne(id);
+    if (!processedAlbum) throw new NotFoundException('Album does not exist.');
+
     const indexOfAlbum = getIndexById(albums, id);
     albums.splice(indexOfAlbum, 1);
     tracks.forEach((track) => {

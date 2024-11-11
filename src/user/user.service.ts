@@ -1,4 +1,8 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdatePasswordDto } from './dto/update-password.dto';
 import { users } from './data';
@@ -31,11 +35,13 @@ export class UserService {
 
   findOne(id: string) {
     const requestedUser: User = users.filter((user: User) => user.id === id)[0];
+    if (!requestedUser) throw new NotFoundException('User does not exist.');
     return requestedUser;
   }
 
   update(id: string, UpdatePasswordDto: UpdatePasswordDto) {
-    const processedUser: User = users.filter((user: User) => user.id === id)[0];
+    const processedUser: User = this.findOne(id);
+    if (!processedUser) throw new NotFoundException('User does not exist.');
     if (processedUser.password !== UpdatePasswordDto.oldPassword)
       throw new ForbiddenException('Old password is wrong.');
     processedUser.updatedAt = Date.now();
@@ -46,6 +52,8 @@ export class UserService {
   }
 
   remove(id: string) {
+    const processedUser: User = this.findOne(id);
+    if (!processedUser) throw new NotFoundException('User does not exist.');
     const indexOfUser = getIndexById(users, id);
     users.splice(indexOfUser, 1);
   }
