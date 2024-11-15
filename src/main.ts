@@ -11,7 +11,6 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   const document = await readFile('doc/api.json', { encoding: 'utf-8' });
-  console.log('document: ', document);
   SwaggerModule.setup('doc', app, JSON.parse(document));
 
   await app.listen(port);

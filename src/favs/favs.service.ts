@@ -24,7 +24,6 @@ export class FavsService {
 
   add<T extends FavItem>(id: string, base: T[], source: T[]) {
     const newFav = this.findOne(source, id) as T;
-    console.log('newFav: ', newFav);
 
     if (newFav) {
       (base as T[]).push(newFav);
