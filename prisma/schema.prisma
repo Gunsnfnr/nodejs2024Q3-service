@@ -15,3 +15,9 @@ model users {
   createdAt Int
   updatedAt Int
 }
+
+model artists {
+  id     String  @id @db.VarChar(36)
+  name   String  @db.VarChar(30)
+  grammy Boolean
+}
