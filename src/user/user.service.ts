@@ -5,14 +5,13 @@ import {
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdatePasswordDto } from './dto/update-password.dto';
-import { users } from './data';
 import { User } from './entities/user.entity';
 import { userWithoutPassword } from './utils/user-wo-password';
-import { getIndexById } from 'src/utils/get-index-by-id';
+import { prisma } from 'prisma/prisma-client';
 
 @Injectable()
 export class UserService {
-  create(createUserDto: CreateUserDto) {
+  async create(createUserDto: CreateUserDto) {
     const creationTimestamp = Date.now();
 
     const newUser: User = {
@@ -24,37 +23,39 @@ export class UserService {
       updatedAt: creationTimestamp,
     };
 
-    users.push(newUser);
+    await prisma.users.create({ data: newUser });
 
     return userWithoutPassword(newUser);
   }
 
-  findAll() {
-    return users;
+  async findAll() {
+    return await prisma.users.findMany();
   }
 
-  findOne(id: string) {
-    const requestedUser: User = users.filter((user: User) => user.id === id)[0];
+  async findOne(id: string) {
+    const requestedUser: User = await prisma.users.findUnique({
+      where: { id: id },
+    });
     if (!requestedUser) throw new NotFoundException('User does not exist.');
     return requestedUser;
   }
 
-  update(id: string, UpdatePasswordDto: UpdatePasswordDto) {
-    const processedUser: User = this.findOne(id);
+  async update(id: string, UpdatePasswordDto: UpdatePasswordDto) {
+    const processedUser: User = await this.findOne(id);
     if (!processedUser) throw new NotFoundException('User does not exist.');
     if (processedUser.password !== UpdatePasswordDto.oldPassword)
       throw new ForbiddenException('Old password is wrong.');
     processedUser.updatedAt = Date.now();
     processedUser.version += 1;
     processedUser.password = UpdatePasswordDto.newPassword;
+    await prisma.users.update({ where: { id: id }, data: processedUser });
 
     return userWithoutPassword(processedUser);
   }
 
-  remove(id: string) {
-    const processedUser: User = this.findOne(id);
+  async remove(id: string) {
+    const processedUser: User = await this.findOne(id);
     if (!processedUser) throw new NotFoundException('User does not exist.');
-    const indexOfUser = getIndexById(users, id);
-    users.splice(indexOfUser, 1);
+    await prisma.users.delete({ where: { id: id } });
   }
 }
