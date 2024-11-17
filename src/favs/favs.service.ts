@@ -3,47 +3,90 @@ import {
   NotFoundException,
   UnprocessableEntityException,
 } from '@nestjs/common';
-import { favs } from './data';
-import { getIndexById } from 'src/utils/get-index-by-id';
 import { Track } from 'src/track/entities/track.entity';
 import { Album } from 'src/album/entities/album.entities';
 import { Artist } from 'src/artist/entities/artist.entity';
+import { prisma } from 'src/prisma-client';
 
 type FavItem = Track | Album | Artist;
+type FavType = 'track' | 'album' | 'artist';
 
 @Injectable()
 export class FavsService {
-  findAll() {
-    return favs;
+  async findAll() {
+    const favArtists = await prisma.fav_artists.findMany();
+    const favAlbums = await prisma.fav_albums.findMany();
+    const favTracks = await prisma.fav_tracks.findMany();
+
+    return {
+      artists: favArtists,
+      albums: favAlbums,
+      tracks: favTracks,
+    };
   }
 
-  private findOne<T extends FavItem>(source: T[], id: string) {
-    const newFav: FavItem = source.filter((item: FavItem) => item.id === id)[0];
+  private async findOne(id: string, favType: FavType) {
+    let newFav: FavItem;
+    switch (favType) {
+      case 'album':
+        newFav = await prisma.albums.findUnique({ where: { id } });
+        break;
+      case 'artist':
+        newFav = await prisma.artists.findUnique({ where: { id } });
+        break;
+      default:
+        newFav = await prisma.tracks.findUnique({ where: { id } });
+    }
     return newFav;
   }
 
-  add<T extends FavItem>(id: string, base: T[], source: T[]) {
-    const newFav = this.findOne(source, id) as T;
+  async add(id: string, favType: FavType) {
+    const newFav = await this.findOne(id, favType);
 
     if (newFav) {
-      (base as T[]).push(newFav);
+      if ('year' in newFav) {
+        await prisma.fav_albums.create({ data: newFav });
+      } else if ('grammy' in newFav) {
+        await prisma.fav_artists.create({ data: newFav });
+      } else if ('duration' in newFav) {
+        await prisma.fav_tracks.create({ data: newFav });
+      }
       return 'Item added to favorites';
-    }
-    {
+    } else {
       throw new UnprocessableEntityException(
-        'Track with the given id does not exist.',
+        'Item with the given id does not exist.',
       );
     }
   }
 
-  remove<T extends FavItem>(id: string, base: T[]) {
-    const indexInFavs = getIndexById(base, id);
-    if (indexInFavs) {
-      base.forEach((item, index) => {
-        if (item.id === id) base.splice(index, 1);
-      });
+  private async findInFavs(id: string, favType: FavType) {
+    let itemInFavs: FavItem;
+    switch (favType) {
+      case 'album':
+        itemInFavs = await prisma.fav_albums.findUnique({ where: { id } });
+        break;
+      case 'artist':
+        itemInFavs = await prisma.fav_artists.findUnique({ where: { id } });
+        break;
+      default:
+        itemInFavs = await prisma.fav_tracks.findUnique({ where: { id } });
+    }
+    return itemInFavs;
+  }
+
+  async remove(id: string, favType: FavType) {
+    const itemInFavs = await this.findInFavs(id, favType);
+    if (itemInFavs) {
+      if ('year' in itemInFavs) {
+        await prisma.fav_albums.delete({ where: { id: id } });
+      } else if ('grammy' in itemInFavs) {
+        await prisma.fav_artists.delete({ where: { id: id } });
+      } else if ('duration' in itemInFavs) {
+        await prisma.fav_tracks.delete({ where: { id: id } });
+      }
+      return 'Item removed from favorites';
     } else {
-      throw new NotFoundException('Item is not in favourites.');
+      throw new NotFoundException('Item is not in favorites.');
     }
   }
 }

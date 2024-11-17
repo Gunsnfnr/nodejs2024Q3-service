@@ -2,8 +2,6 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateTrackDto } from './dto/create-track.dto';
 import { UpdateTrackDto } from './dto/update-track.dto';
 import { Track } from './entities/track.entity';
-import { removeFavFrom } from 'src/utils/remove-fav';
-import { favs } from 'src/favs/data';
 import { prisma } from 'src/prisma-client';
 
 @Injectable()
@@ -61,6 +59,7 @@ export class TrackService {
 
     await prisma.tracks.delete({ where: { id: id } });
 
-    removeFavFrom(favs.tracks, id);
+    const trackInFav = await prisma.fav_tracks.findUnique({ where: { id } });
+    if (trackInFav) await prisma.fav_tracks.delete({ where: { id } }).catch();
   }
 }

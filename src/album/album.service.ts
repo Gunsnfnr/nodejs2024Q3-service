@@ -2,9 +2,6 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateAlbumDto } from './dto/create-album.dto';
 import { Album } from './entities/album.entities';
 import { UpdateAlbumDto } from './dto/update-album.dto';
-import { tracks } from 'src/track/data';
-import { removeFavFrom } from 'src/utils/remove-fav';
-import { favs } from 'src/favs/data';
 import { prisma } from 'src/prisma-client';
 
 @Injectable()
@@ -60,9 +57,7 @@ export class AlbumService {
 
     await prisma.albums.delete({ where: { id: id } });
 
-    tracks.forEach((track) => {
-      if (track.albumId === id) track.albumId = null;
-    });
-    removeFavFrom(favs.albums, id);
+    const albumInFav = await prisma.fav_albums.findUnique({ where: { id } });
+    if (albumInFav) await prisma.fav_albums.delete({ where: { id } });
   }
 }
