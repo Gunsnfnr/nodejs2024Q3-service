@@ -1,16 +1,15 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateAlbumDto } from './dto/create-album.dto';
 import { Album } from './entities/album.entities';
-import { albums } from './data';
 import { UpdateAlbumDto } from './dto/update-album.dto';
-import { getIndexById } from 'src/utils/get-index-by-id';
 import { tracks } from 'src/track/data';
 import { removeFavFrom } from 'src/utils/remove-fav';
 import { favs } from 'src/favs/data';
+import { prisma } from 'src/prisma-client';
 
 @Injectable()
 export class AlbumService {
-  create(createAlbumtDto: CreateAlbumDto) {
+  async create(createAlbumtDto: CreateAlbumDto) {
     const newAlbum: Album = {
       id: crypto.randomUUID(),
       name: createAlbumtDto.name,
@@ -18,26 +17,26 @@ export class AlbumService {
       artistId: createAlbumtDto.artistId,
     };
 
-    albums.push(newAlbum);
+    await prisma.albums.create({ data: newAlbum });
 
     return newAlbum;
   }
 
-  findAll() {
-    return albums;
+  async findAll() {
+    return await prisma.albums.findMany();
   }
 
-  findOne(id: string) {
-    const requestedAlbum: Album = albums.filter(
-      (album: Album) => album.id === id,
-    )[0];
+  async findOne(id: string) {
+    const requestedAlbum: Album = await prisma.albums.findUnique({
+      where: { id: id },
+    });
     if (!requestedAlbum) throw new NotFoundException('Album does not exist.');
 
     return requestedAlbum;
   }
 
-  update(id: string, updateAlbumDto: UpdateAlbumDto) {
-    const processedAlbum: Album = this.findOne(id);
+  async update(id: string, updateAlbumDto: UpdateAlbumDto) {
+    const processedAlbum: Album = await this.findOne(id);
     if (!processedAlbum) throw new NotFoundException('Album does not exist.');
 
     if ('name' in updateAlbumDto) {
@@ -50,15 +49,17 @@ export class AlbumService {
       processedAlbum.artistId = updateAlbumDto.artistId;
     }
 
+    await prisma.albums.update({ where: { id: id }, data: processedAlbum });
+
     return processedAlbum;
   }
 
-  remove(id: string) {
-    const processedAlbum: Album = this.findOne(id);
+  async remove(id: string) {
+    const processedAlbum: Album = await this.findOne(id);
     if (!processedAlbum) throw new NotFoundException('Album does not exist.');
 
-    const indexOfAlbum = getIndexById(albums, id);
-    albums.splice(indexOfAlbum, 1);
+    await prisma.albums.delete({ where: { id: id } });
+
     tracks.forEach((track) => {
       if (track.albumId === id) track.albumId = null;
     });
