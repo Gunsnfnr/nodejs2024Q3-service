@@ -22,6 +22,7 @@ model artists {
   name   String   @db.VarChar(30)
   grammy Boolean
   albums albums[]
+  tracks tracks[]
 }
 
 model albums {
@@ -29,5 +30,16 @@ model albums {
   name     String   @db.VarChar(30)
   year     Int
   artistId String?  @db.VarChar(36)
+  artists  artists? @relation(fields: [artistId], references: [id], onUpdate: NoAction, map: "artistId_fkey")
+  tracks   tracks[]
+}
+
+model tracks {
+  id       String   @id @db.VarChar(36)
+  name     String   @db.VarChar(30)
+  artistId String?  @db.VarChar(36)
+  albumId  String?  @db.VarChar(36)
+  duration Int
+  albums   albums?  @relation(fields: [albumId], references: [id], onUpdate: NoAction, map: "albumId_fkey")
   artists  artists? @relation(fields: [artistId], references: [id], onUpdate: NoAction, map: "artistId_fkey")
 }
