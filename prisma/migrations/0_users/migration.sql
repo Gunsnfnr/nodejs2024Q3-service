@@ -4,8 +4,8 @@ CREATE TABLE "users" (
     "login" VARCHAR(30) NOT NULL,
     "password" VARCHAR(30) NOT NULL,
     "version" INTEGER NOT NULL,
-    "createdAt" INTEGER NOT NULL,
-    "updatedAt" INTEGER NOT NULL,
+    "createdAt" TEXT NOT NULL,
+    "updatedAt" TEXT NOT NULL,
 
     CONSTRAINT "users_pkey" PRIMARY KEY ("id")
 );

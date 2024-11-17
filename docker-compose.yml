@@ -1,6 +1,7 @@
-version: '3'
 services:
   node:
+    env_file:
+      - path: .env
     build: .
     ports:
       - ${PORT}:${PORT}

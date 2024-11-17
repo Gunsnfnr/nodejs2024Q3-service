@@ -6,7 +6,7 @@ import { albums } from 'src/album/data';
 import { tracks } from 'src/track/data';
 import { favs } from 'src/favs/data';
 import { removeFavFrom } from 'src/utils/remove-fav';
-import { prisma } from 'prisma/prisma-client';
+import { prisma } from 'src/prisma-client';
 
 @Injectable()
 export class ArtistService {

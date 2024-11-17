@@ -7,7 +7,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdatePasswordDto } from './dto/update-password.dto';
 import { User } from './entities/user.entity';
 import { userWithoutPassword } from './utils/user-wo-password';
-import { prisma } from 'prisma/prisma-client';
+import { prisma } from 'src/prisma-client';
 
 @Injectable()
 export class UserService {
@@ -23,21 +23,48 @@ export class UserService {
       updatedAt: creationTimestamp,
     };
 
-    await prisma.users.create({ data: newUser });
+    await prisma.users.create({
+      data: {
+        id: newUser.id,
+        login: newUser.login,
+        password: newUser.password,
+        version: newUser.version,
+        createdAt: String(creationTimestamp),
+        updatedAt: String(creationTimestamp),
+      },
+    });
 
     return userWithoutPassword(newUser);
   }
 
   async findAll() {
-    return await prisma.users.findMany();
+    const users: User[] = (await prisma.users.findMany()).map((user) => {
+      return {
+        id: user.id,
+        login: user.login,
+        password: user.password,
+        version: user.version,
+        createdAt: Number(user.createdAt),
+        updatedAt: Number(user.updatedAt),
+      };
+    });
+
+    return users;
   }
 
   async findOne(id: string) {
-    const requestedUser: User = await prisma.users.findUnique({
+    const requestedUser = await prisma.users.findUnique({
       where: { id: id },
     });
     if (!requestedUser) throw new NotFoundException('User does not exist.');
-    return requestedUser;
+    return {
+      id: requestedUser.id,
+      login: requestedUser.login,
+      password: requestedUser.password,
+      version: requestedUser.version,
+      createdAt: Number(requestedUser.createdAt),
+      updatedAt: Number(requestedUser.updatedAt),
+    };
   }
 
   async update(id: string, UpdatePasswordDto: UpdatePasswordDto) {
@@ -48,7 +75,18 @@ export class UserService {
     processedUser.updatedAt = Date.now();
     processedUser.version += 1;
     processedUser.password = UpdatePasswordDto.newPassword;
-    await prisma.users.update({ where: { id: id }, data: processedUser });
+
+    await prisma.users.update({
+      where: { id: id },
+      data: {
+        id: processedUser.id,
+        login: processedUser.login,
+        password: processedUser.password,
+        version: processedUser.version,
+        createdAt: String(processedUser.createdAt),
+        updatedAt: String(processedUser.updatedAt),
+      },
+    });
 
     return userWithoutPassword(processedUser);
   }

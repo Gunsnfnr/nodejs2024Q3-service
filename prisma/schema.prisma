@@ -1,5 +1,6 @@
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
 }
 
 datasource db {
@@ -12,12 +13,21 @@ model users {
   login     String @db.VarChar(30)
   password  String @db.VarChar(30)
   version   Int
-  createdAt Int
-  updatedAt Int
+  createdAt String
+  updatedAt String
 }
 
 model artists {
-  id     String  @id @db.VarChar(36)
-  name   String  @db.VarChar(30)
+  id     String   @id @db.VarChar(36)
+  name   String   @db.VarChar(30)
   grammy Boolean
+  albums albums[]
+}
+
+model albums {
+  id       String   @id @db.VarChar(36)
+  name     String   @db.VarChar(30)
+  year     Int
+  artistId String?  @db.VarChar(36)
+  artists  artists? @relation(fields: [artistId], references: [id], onUpdate: NoAction, map: "artistId_fkey")
 }

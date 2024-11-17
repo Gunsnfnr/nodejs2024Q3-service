@@ -3,8 +3,9 @@ WORKDIR /app
 COPY package*.json .
 RUN npm install
 COPY . .
+RUN npx prisma generate
 
 FROM node:alpine AS main
 COPY --from=build /app /
-EXPOSE 4000
+EXPOSE ${PORT}
 CMD ["npm", "start"]
