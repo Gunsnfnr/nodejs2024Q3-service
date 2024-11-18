@@ -8,8 +8,10 @@
 ## Downloading
 
 ```
-git clone https://github.com/Gunsnfnr/nodejs2024Q3-service
+git clone https://github.com/gunsnfnr/nodejs2024Q3-service
 ```
+
+Switch to `develop2` branch
 
 ## Installing NPM modules
 
@@ -17,10 +19,21 @@ git clone https://github.com/Gunsnfnr/nodejs2024Q3-service
 npm install
 ```
 
+## Environment variables
+
+Rename `.env.example` file to `.env`
+
+## Docker images
+
+```
+docker pull artyompav/nodejs2024q3-service-node
+docker pull artyompav/nodejs2024q3-service-postgres
+```
+
 ## Running application
 
 ```
-npm start
+npm run docker:up
 ```
 
 After starting the app on port (4000 as default) you can open
