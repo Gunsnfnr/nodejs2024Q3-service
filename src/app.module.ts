@@ -6,9 +6,19 @@ import { ArtistModule } from './artist/artist.module';
 import { AlbumModule } from './album/album.module';
 import { TrackModule } from './track/track.module';
 import { FavsModule } from './favs/favs.module';
+import { SignupModule } from './signup/signup.module';
+import { LoginModule } from './login/login.module';
 
 @Module({
-  imports: [UserModule, ArtistModule, AlbumModule, TrackModule, FavsModule],
+  imports: [
+    UserModule,
+    ArtistModule,
+    AlbumModule,
+    TrackModule,
+    FavsModule,
+    SignupModule,
+    LoginModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
