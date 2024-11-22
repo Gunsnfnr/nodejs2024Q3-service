@@ -10,11 +10,14 @@ import {
   ValidationPipe,
   ParseUUIDPipe,
   HttpCode,
+  UseGuards,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdatePasswordDto } from './dto/update-password.dto';
+import { AuthGuard } from './auth.guard';
 
+@UseGuards(AuthGuard)
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
