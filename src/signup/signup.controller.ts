@@ -8,11 +8,11 @@ import {
 import { SignupService } from './signup.service';
 import { CreateSignupDto } from './dto/create-signup.dto';
 
-@Controller('auth/signup')
+@Controller('auth')
 export class SignupController {
   constructor(private readonly signupService: SignupService) {}
 
-  @Post()
+  @Post('signup')
   @UsePipes(
     new ValidationPipe({
       whitelist: true,

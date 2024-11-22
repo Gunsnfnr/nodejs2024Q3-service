@@ -1,6 +1,6 @@
 services:
   node:
-    image: artyompav/nodejs2024q3-service-postgres
+    # image: artyompav/nodejs2024q3-service-postgres
     env_file:
       - path: .env
     build: .

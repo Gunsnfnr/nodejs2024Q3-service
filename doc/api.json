@@ -151,7 +151,7 @@
     }
   ],
   "paths": {
-    "/login": {
+    "/auth/login": {
       "post": {
         "tags": ["Login"],
         "security": [],
@@ -202,7 +202,7 @@
         }
       }
     },
-    "/signup": {
+    "/auth/signup": {
       "post": {
         "tags": ["Signup"],
         "security": [],
