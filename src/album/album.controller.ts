@@ -8,13 +8,16 @@ import {
   ParseUUIDPipe,
   Post,
   Put,
+  UseGuards,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
 import { AlbumService } from './album.service';
 import { CreateAlbumDto } from './dto/create-album.dto';
 import { UpdateAlbumDto } from './dto/update-album.dto';
+import { AuthGuard } from 'src/user/auth.guard';
 
+@UseGuards(AuthGuard)
 @Controller('album')
 export class AlbumContoller {
   constructor(private readonly albumService: AlbumService) {}
