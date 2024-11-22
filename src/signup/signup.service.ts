@@ -34,6 +34,8 @@ export class SignupService {
       },
     });
 
-    return 'User created.';
+    return {
+      id: newUser.id,
+    };
   }
 }
