@@ -11,7 +11,7 @@
 git clone https://github.com/gunsnfnr/nodejs2024Q3-service
 ```
 
-Switch to `develop2` branch
+Switch to `develop3` branch
 
 ## Installing NPM modules
 
@@ -23,12 +23,6 @@ npm install
 
 Rename `.env.example` file to `.env`
 
-## Docker images
-
-```
-docker pull artyompav/nodejs2024q3-service-node
-docker pull artyompav/nodejs2024q3-service-postgres
-```
 
 ## Running application
 
@@ -44,17 +38,6 @@ For more information about OpenAPI/Swagger please visit https://swagger.io/.
 
 After application running open new terminal and enter:
 
-To run all tests without authorization
-
-```
-npm run test
-```
-
-To run only one of all test suites
-
-```
-npm run test -- <path to suite>
-```
 
 To run all test with authorization
 
@@ -62,10 +45,10 @@ To run all test with authorization
 npm run test:auth
 ```
 
-To run only specific test suite with authorization
+To run only refresh token related tests
 
 ```
-npm run test:auth -- <path to suite>
+npm run test:refresh
 ```
 
 ## More details on usage
