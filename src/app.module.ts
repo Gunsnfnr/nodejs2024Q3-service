@@ -8,6 +8,7 @@ import { TrackModule } from './track/track.module';
 import { FavsModule } from './favs/favs.module';
 import { SignupModule } from './signup/signup.module';
 import { LoginModule } from './login/login.module';
+import { LoggerModule } from './services/logger/logger.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { LoginModule } from './login/login.module';
     FavsModule,
     SignupModule,
     LoginModule,
+    LoggerModule,
   ],
   controllers: [AppController],
   providers: [AppService],

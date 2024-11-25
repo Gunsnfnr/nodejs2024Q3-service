@@ -5,7 +5,8 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { Http2ServerRequest } from 'http2';
+import { Request } from 'express';
+import { Logger } from 'src/services/logger/logger.service';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -13,6 +14,12 @@ export class AuthGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
+
+    const logger = new Logger();
+    logger.log('method: ' + request.method);
+    logger.log('url: ' + request.url);
+    logger.log('body: ' + JSON.stringify(request.body));
+
     const token = this.extractTokenFromHeader(request);
     if (!token) {
       throw new UnauthorizedException();
@@ -26,9 +33,7 @@ export class AuthGuard implements CanActivate {
     return true;
   }
 
-  private extractTokenFromHeader(
-    request: Http2ServerRequest,
-  ): string | undefined {
+  private extractTokenFromHeader(request: Request): string | undefined {
     const [type, token] = request.headers.authorization?.split(' ') ?? [];
     return type === 'Bearer' ? token : undefined;
   }
